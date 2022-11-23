@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Entidades;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Data.OracleClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 namespace login
 {
     public partial class Login : Form
@@ -17,23 +15,21 @@ namespace login
         {
             InitializeComponent();
         }
-        OracleConnection conexion = new OracleConnection("DATA SOURCE= XEPDB1 ; PASSWORD = 1066268141 ; USER ID = leonardo");
+        Logica.ServicioLogin ServicioLogin = new Logica.ServicioLogin();
         public void conectarmeBD()
         {
-            conexion.Open();
-            OracleCommand command = new OracleCommand("SELECT * FROM LOGIN WHERE USUARIO_NAME =:usuario_name AND CLAVE_USER =: contra",conexion);
-            command.Parameters.AddWithValue(":usuario_name",txtUsuario.Text);
-            command.Parameters.AddWithValue(":contra", txtContraseña.Text);
-            OracleDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            var user = new Usuario();
+            user.UserName = txtUsuario.Text;
+            user.Password = txtContraseña.Text;
+            var respuesta = ServicioLogin.verificarUsuario(user);
+            if (respuesta.Equals("SI"))
             {
                 Prueba prueba = new Prueba();
-                conexion.Close();
                 prueba.Show();
             }
             else
             {
-                MessageBox.Show("CONTRASEÑA INCORRECTA");
+                MessageBox.Show(respuesta.ToString());
             }
         }
         private void btnIniciarSesion_Click(object sender, EventArgs e)
@@ -49,7 +45,6 @@ namespace login
             prueba.Show();
    
         }
-
         private void txtContraseña_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar.Equals(Convert.ToChar(Keys.Enter)))
@@ -57,6 +52,10 @@ namespace login
                 this.Visible = false;
                 conectarmeBD();
             }
+        }
+        private void Login_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

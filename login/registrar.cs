@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Entidades;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.OracleClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -18,7 +18,7 @@ namespace login
             InitializeComponent();
         }
         Login milog =new Login();
-        OracleConnection conexion = new OracleConnection("DATA SOURCE= XEPDB1 ; PASSWORD = 1066268141 ; USER ID = leonardo");
+        Logica.ServicioLogin ServicioLogin = new Logica.ServicioLogin();
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
             registrarUsuario();
@@ -27,20 +27,17 @@ namespace login
         {
             try
             {
-                conexion.Open();
-                OracleCommand command = new OracleCommand("crear_user", conexion);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.Parameters.Add("v_id", OracleType.VarChar).Value = txtId.Text;
-                command.Parameters.Add("v_nombre", OracleType.VarChar).Value = txtUsuario.Text;
-                command.Parameters.Add("v_clave", OracleType.VarChar).Value = txtContraseña.Text;
-                command.ExecuteNonQuery();
-                MessageBox.Show("USUARIO CREADO");
+                var User = new Usuario();
+                User.UserName = txtUsuario.Text;
+                User.IdUser = txtId.Text;
+                User.Password = txtContraseña.Text;
+                var estado=ServicioLogin.RegistrarUser(User);
+                MessageBox.Show(estado.ToString ());
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
-            conexion.Close();
         }
 
         private void btnVolver_Click(object sender, EventArgs e)
